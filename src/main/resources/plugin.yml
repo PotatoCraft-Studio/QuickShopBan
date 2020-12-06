@@ -1,0 +1,6 @@
+name: QuickShopBan
+version: ${project.version}
+main: studio.potatocraft.quickshopban.QuickShopBan
+api-version: 1.13
+depend: [QuickShop]
+description: Banning a player from your shop

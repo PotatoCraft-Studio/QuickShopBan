@@ -1,0 +1,7 @@
+lang:
+  player-not-exists: "The player never played before, please check your input."
+  banned: "You're banned from this shop, so you cannot purchase in this shop."
+  ban-success: "Successfully banned player {0} from this shop."
+  unban-success: "Successfully unbanned player {0} from this shop."
+  ban-desc: "Ban player from a shop."
+  unban-desc: "Unban a player from a shop."
