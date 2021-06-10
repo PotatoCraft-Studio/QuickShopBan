@@ -5,22 +5,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.api.QuickShopAPI;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.shop.ShopType;
 import org.maxgamer.quickshop.util.MsgUtil;
-import org.maxgamer.quickshop.util.Util;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 public class BanCommand implements CommandProcesser {
     private final QuickShopBan plugin;
-    private final Gson gson = new Gson();
     public BanCommand (QuickShopBan plugin){
         this.plugin = plugin;
     }
@@ -48,17 +45,16 @@ public class BanCommand implements CommandProcesser {
         }
 
         while (bIt.hasNext()) {
-            final Block b = bIt.next();
-            final Shop shop = QuickShopAPI.getShopAPI().getShop(b.getLocation());
-            if (shop != null) {
-                Map<String,String> extra = shop.getExtra(plugin);
-                String banlistStr = extra.get("banlist");
-                BanContainer container = gson.fromJson(banlistStr,BanContainer.class);
-                if(!container.getBanningPlayers().contains(player.getUniqueId().toString())){
-                    container.getBanningPlayers().add(player.getUniqueId().toString());
+            Block b = bIt.next();
+           Optional<Shop> shop = QuickShopAPI.getShopAPI().getShop(b.getLocation());
+            if (shop.isPresent()) {
+                Shop qshop = shop.get();
+                ConfigurationSection extra = qshop.getExtra(plugin);
+                List<String> bannedPlayers = extra.getStringList("bannedplayers");
+                if(!bannedPlayers.contains(player.getUniqueId().toString())){
+                    bannedPlayers.add(player.getUniqueId().toString());
                 }
-                extra.put("banlist",gson.toJson(container));
-                shop.setExtra(plugin,extra);
+                qshop.setExtra(plugin,extra);
                 MsgUtil.sendMessage(commandSender,MsgUtil.fillArgs(plugin.getConfig().getString("lang.ban-success"), player.getName()));
                 return;
             }

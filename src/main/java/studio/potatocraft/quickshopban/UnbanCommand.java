@@ -1,10 +1,10 @@
 package studio.potatocraft.quickshopban;
 
-import com.google.gson.Gson;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BlockIterator;
 import org.maxgamer.quickshop.api.QuickShopAPI;
@@ -12,11 +12,11 @@ import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.util.MsgUtil;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 
 public class UnbanCommand implements CommandProcesser {
     private final QuickShopBan plugin;
-    private final Gson gson = new Gson();
     public UnbanCommand(QuickShopBan plugin){
         this.plugin = plugin;
     }
@@ -43,16 +43,16 @@ public class UnbanCommand implements CommandProcesser {
             return;
         }
 
+
         while (bIt.hasNext()) {
-            final Block b = bIt.next();
-            final Shop shop = QuickShopAPI.getShopAPI().getShop(b.getLocation());
-            if (shop != null) {
-                Map<String,String> extra = shop.getExtra(plugin);
-                String banlistStr = extra.get("banlist");
-                BanContainer container = gson.fromJson(banlistStr,BanContainer.class);
-                container.getBanningPlayers().remove(player.getUniqueId().toString());
-                extra.put("banlist",gson.toJson(container));
-                shop.setExtra(plugin,extra);
+            Block b = bIt.next();
+            Optional<Shop> shop = QuickShopAPI.getShopAPI().getShop(b.getLocation());
+            if (shop.isPresent()) {
+                Shop qshop = shop.get();
+                ConfigurationSection extra = qshop.getExtra(plugin);
+                List<String> bannedPlayers = extra.getStringList("bannedplayers");
+                bannedPlayers.remove(player.getUniqueId().toString());
+                qshop.setExtra(plugin,extra);
                 MsgUtil.sendMessage(commandSender,MsgUtil.fillArgs(plugin.getConfig().getString("lang.unban-success"), player.getName()));
                 return;
             }

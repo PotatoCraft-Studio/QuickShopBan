@@ -1,7 +1,7 @@
 package studio.potatocraft.quickshopban;
 
-import com.google.gson.Gson;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -11,11 +11,9 @@ import org.maxgamer.quickshop.event.ShopPurchaseEvent;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.util.MsgUtil;
 
-import java.util.Map;
+import java.util.List;
 
 public final class QuickShopBan extends JavaPlugin implements Listener {
-    private final Gson gson = new Gson();
-
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -38,9 +36,9 @@ public final class QuickShopBan extends JavaPlugin implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onShopPurchaseEvent(ShopPurchaseEvent event){
         Shop shop = event.getShop();
-        Map<String, String> extra = shop.getExtra(this);
-        BanContainer banlist = gson.fromJson(extra.get("banlist"),BanContainer.class);
-        if(banlist.getBanningPlayers().contains(event.getPlayer().getUniqueId().toString())){
+        ConfigurationSection extra = shop.getExtra(this);
+        List<String> bannedPlayers = extra.getStringList("bannedplayers");
+        if(bannedPlayers.contains(event.getPurchaser().toString())){
             MsgUtil.sendMessage(event.getPlayer(),getConfig().getString("lang.banned"));
             event.setCancelled(true);
         }

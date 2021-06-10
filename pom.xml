@@ -62,10 +62,9 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
-
         <repository>
             <id>quickshop-repo</id>
-            <url>https://repo.codemc.io/</url>
+            <url>https://repo.codemc.io/repository/maven-releases/</url>
         </repository>
     </repositories>
 
@@ -79,7 +78,7 @@
         <dependency>
             <groupId>org.maxgamer</groupId>
             <artifactId>QuickShop</artifactId>
-            <version>4.0.5.4</version>
+            <version>4.0.8.6</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
